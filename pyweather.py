@@ -28,7 +28,7 @@ from urllib.parse import urlencode
 import requests
 from logger import logger
 from datetime import datetime
-
+from math import floor
 
 
 
@@ -94,7 +94,7 @@ class Weather:
             self.wind_direction = float(data['wind']['deg'])
 
             # Nivel de nubes
-            self.cloud_level = float(data['clouds']['all'])
+            self.clouds_level = float(data['clouds']['all'])
 
             # LLuvia y/o viento
             self.rain_volume = float(data['rain']['3h']) if 'rain' in data else 0
@@ -166,6 +166,13 @@ class Weather:
         '''
         return self.humidity
 
+    def get_clouds_level(self):
+        '''
+        Consulta el porcentaje de nubes
+        :return:
+        '''
+        return self.clouds_level
+
     def get_athmospheric_sea_pressure(self):
         '''
         :return: Devuelve la presión atmosférica al nivel del mar en hPa
@@ -206,11 +213,28 @@ class Weather:
 
     def get_snow_volume(self):
         '''
-        :return: Devuelve el volumne de nieve en las últimas 3 horas en mm
+        :return: Devuelve el volumen de nieve en las últimas 3 horas en mm
         '''
         return self.snow_volume
 
+    def __str__(self):
+        str = self.get_description() + '\n'
+        str += 'Temp: {}ºC, min: {}ºC, max: {}ºC\n'.format(self.get_temperature(), self.get_min_temperature(),
+                                                         self.get_max_temperature())
+        if self.get_clouds_level() > 0:
+            str += '{}% of clouds\n'.format(self.get_clouds_level())
 
+        str += '{}% of humidity\n'.format(self.get_humidity())
+        str += 'Athmospheric pressure: {}hPa\n'.format(self.get_athmospheric_pressure())
+        str += 'Wind speed: {}m/s\n'.format(self.get_wind_speed())
+
+        if self.get_rain_volume() > 0:
+            str += 'Rain volume: {}mm\n'.format(self.get_rain_volume())
+
+        if self.get_snow_volume() > 0:
+            str += 'Snow volume: {}mm\n'.format(self.get_snow_volume())
+
+        return str
 
 
 
@@ -366,4 +390,41 @@ class PyWeather:
         :return: Devuelve una lista de instancias de la clase Weather. Cada uno de estos objetos representará
         las condiciones climáticas del lugar o ciudad indicados, en un momento específico en el tiempo.
         '''
-        pass
+
+        if city is None and coords is None:
+            raise ValueError('You must specify either a city or a place to get weather history')
+
+
+        # Generamos los parámetros para la request a OpenWeatherMap
+        params = {}
+
+        # Añadimos siempre la API key como parámetro
+        params['APPID'] = self.api_key
+
+        if not city is None:
+            params['id'] = city.get_id()
+        else:
+            params['lat'], params['long'] = coords
+
+        # Añadimos las fechas de inicioy fin y calculamos la cantidad de datos que queremos obtener.
+        start = int(start.strftime('%s'))
+        end = int((end if not end is None else datetime.utcnow()).strftime('%s'))
+        amount = floor((end - start) / (interval * 24 * 60 * 60))
+
+        params['start'] = start
+        params['end'] = end
+        params['cnt'] = amount
+
+        response = OpenWeatherMapProxy().get('history/city', params)
+
+        try:
+            weathers = []
+            for data in response['list']:
+                try:
+                    weather = Weather(data)
+                    weathers.append(weather)
+                except:
+                    pass
+            return weathers
+        except:
+            raise Exception('Error parsing weather history')
