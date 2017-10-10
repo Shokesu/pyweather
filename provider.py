@@ -220,20 +220,20 @@ class Weather:
 
     def __str__(self):
         str = self.get_description() + '\n'
-        str += 'Temp: {}ºC, min: {}ºC, max: {}ºC\n'.format(self.get_temperature(), self.get_min_temperature(),
-                                                         self.get_max_temperature())
+        str += 'Temp: {}ºC, min: {}ºC, max: {}ºC\n'.format(int(self.get_temperature()), int(self.get_min_temperature()),
+                                                         int(self.get_max_temperature()))
         if self.get_clouds_level() > 0:
-            str += '{}% of clouds\n'.format(self.get_clouds_level())
+            str += '{}% of clouds\n'.format(int(self.get_clouds_level()))
 
-        str += '{}% of humidity\n'.format(self.get_humidity())
-        str += 'Athmospheric pressure: {}hPa\n'.format(self.get_athmospheric_pressure())
-        str += 'Wind speed: {}m/s\n'.format(self.get_wind_speed())
+        str += '{}% of humidity\n'.format(int(self.get_humidity()))
+        str += 'Athmospheric pressure: {}hPa\n'.format(int(self.get_athmospheric_pressure()))
+        str += 'Wind speed: {}m/s\n'.format(round(self.get_wind_speed(), 2))
 
         if self.get_rain_volume() > 0:
-            str += 'Rain volume: {}mm\n'.format(self.get_rain_volume())
+            str += 'Rain volume: {}mm\n'.format(round(self.get_rain_volume(), 2))
 
         if self.get_snow_volume() > 0:
-            str += 'Snow volume: {}mm\n'.format(self.get_snow_volume())
+            str += 'Snow volume: {}mm\n'.format(round(self.get_snow_volume(), 2))
 
         return str
 
