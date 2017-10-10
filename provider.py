@@ -91,7 +91,7 @@ class Weather:
 
             # Velocidad y dirección del viento
             self.wind_speed = float(data['wind']['speed'])
-            self.wind_direction = float(data['wind']['deg'])
+            self.wind_direction = float(data['wind']['deg']) if 'deg' in data['wind'] else None
 
             # Nivel de nubes
             self.clouds_level = float(data['clouds']['all'])
@@ -201,7 +201,8 @@ class Weather:
 
     def get_wind_direction(self):
         '''
-        :return: Devuelve la velocidad del viento en grados centigrados.
+        :return: Devuelve la dirección del viento. Puede devolver None
+        (si no se posee información sobre la direción del viento)
         '''
         return self.wind_direction
 
