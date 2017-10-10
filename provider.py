@@ -302,7 +302,7 @@ class OpenWeatherMapProxy:
         return getattr(OpenWeatherMapProxy.instance, item)
 
 
-class PyWeather:
+class Provider:
     class Validator:
         '''
         Clase auxiliar para válidar algunos parámetros de los métodos de clase
