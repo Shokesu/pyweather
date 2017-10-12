@@ -134,6 +134,9 @@ class City:
                 city = City(id, name, country, (longitude, latitude))
                 matched_cities.append(city)
 
+            if not country is None:
+                return matched_cities[0]
+
             return matched_cities if len(matched_cities) > 1 else\
                 (matched_cities[0] if len(matched_cities) == 1 else None)
 
